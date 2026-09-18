@@ -1,39 +1,48 @@
 import type { BotEvent } from "../types/event.js";
-import type { Client, Interaction } from "discord.js";
+import type { Client, Interaction, InteractionReplyOptions } from "discord.js";
+import { MessageFlags } from "discord.js";
 
 const event: BotEvent<"interactionCreate"> = {
   name: "interactionCreate",
   async execute(interaction: Interaction) {
-    if (!interaction.isChatInputCommand()) return;
+    if (interaction.isChatInputCommand()) {
+      const client = interaction.client as Client;
+      const command = client.commands.get(interaction.commandName);
 
-    const client = interaction.client as Client;
-    const command = client.commands.get(interaction.commandName);
+      if (!command) {
+        console.warn(
+          `[commands] comando "${interaction.commandName}" não encontrado`,
+        );
+        return;
+      }
 
-    if (!command) {
-      console.warn(
-        `[commands] comando "${interaction.commandName}" não encontrado`,
-      );
+      try {
+        await command.execute(interaction);
+      } catch (error) {
+        console.error(
+          `[commands] erro ao executar "${interaction.commandName}":`,
+          error,
+        );
+
+        const errorReply: InteractionReplyOptions = {
+          content:
+            "Deu ruim ao executar esse comando. Tenta de novo mais tarde.",
+          flags: MessageFlags.Ephemeral,
+        };
+
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(errorReply);
+        } else {
+          await interaction.reply(errorReply);
+        }
+      }
       return;
     }
 
-    try {
-      await command.execute(interaction);
-    } catch (error) {
-      console.error(
-        `[commands] erro ao executar "${interaction.commandName}":`,
-        error,
-      );
-
-      const errorReply = {
-        content: "Deu ruim ao executar esse comando. Tenta de novo mais tarde.",
-        ephemeral: true,
-      };
-
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp(errorReply);
-      } else {
-        await interaction.reply(errorReply);
-      }
+    if (interaction.isButton()) {
+      // Ainda não temos handlers de botão reais — vão entrar aqui
+      // conforme criarmos as ações do builder
+      return;
     }
   },
 };
