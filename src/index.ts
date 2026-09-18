@@ -2,6 +2,7 @@ import "dotenv/config";
 import { client } from "./config/client.js";
 import { loadEvents } from "./utils/loadEvents.js";
 import { loadCommands } from "./utils/loadCommands.js";
+import { connectDatabase } from "./config/database.js";
 
 const { DISCORD_TOKEN } = process.env;
 
@@ -10,6 +11,7 @@ if (!DISCORD_TOKEN) {
   process.exit(1);
 }
 
+await connectDatabase();
 await loadCommands(client);
 await loadEvents(client);
 

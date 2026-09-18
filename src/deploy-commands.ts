@@ -6,7 +6,7 @@ import path from "node:path";
 import type { Command } from "./types/command.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const { DISCORD_TOKEN, CLIENT_ID, DEV_GUILD_ID } = process.env;
+const { DISCORD_TOKEN, CLIENT_ID, DEV_GUILD_IDS } = process.env;
 
 if (!DISCORD_TOKEN || !CLIENT_ID) {
   console.error("[deploy] Faltam DISCORD_TOKEN e/ou CLIENT_ID no .env");
@@ -30,13 +30,17 @@ const rest = new REST().setToken(DISCORD_TOKEN);
 try {
   console.log(`[deploy] registrando ${commands.length} comando(s)...`);
 
-  if (DEV_GUILD_ID) {
-    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, DEV_GUILD_ID), {
-      body: commands,
-    });
-    console.log(
-      `[deploy] comandos registrados no servidor de dev (${DEV_GUILD_ID})`,
-    );
+  if (DEV_GUILD_IDS) {
+    const guildIds = DEV_GUILD_IDS.split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    for (const guildId of guildIds) {
+      await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), {
+        body: commands,
+      });
+      console.log(`[deploy] comandos registrados no servidor ${guildId}`);
+    }
   } else {
     await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
     console.log("[deploy] comandos registrados globalmente");
