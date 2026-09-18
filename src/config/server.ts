@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 
 // Routes
 import { authRouter } from "../routes/auth.routes.js";
+import { guildsRouter } from "../routes/guilds.routes.js";
 
 function formatUptime(seconds: number): string {
   const hrs = Math.floor(seconds / 3600);
@@ -40,3 +41,4 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/auth", authRouter);
+app.use("/guilds", guildsRouter);
