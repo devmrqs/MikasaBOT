@@ -44,17 +44,16 @@ authRouter.get("/discord/callback", async (req, res) => {
   const tokenData = await tokenResponse.json();
   const { access_token } = tokenData;
 
-  const [userResponse, guildsResponse] = await Promise.all([
-    fetch("https://discord.com/api/users/@me", {
-      headers: { Authorization: `Bearer ${access_token}` },
-    }),
-    fetch("https://discord.com/api/users/@me/guilds", {
-      headers: { Authorization: `Bearer ${access_token}` },
-    }),
-  ]);
-
+  const userResponse = await fetch("https://discord.com/api/users/@me", {
+    headers: { Authorization: `Bearer ${access_token}` },
+  });
   const user = await userResponse.json();
-  const guilds = await guildsResponse.json();
 
-  res.json({ user, guilds });
+  req.session.discordAccessToken = access_token;
+  req.session.discordUserId = user.id;
+
+  res.json({
+    message: "Login realizado com sucesso!",
+    user: { id: user.id, username: user.username },
+  });
 });

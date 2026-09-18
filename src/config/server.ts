@@ -1,4 +1,6 @@
 import express, { type Express } from "express";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 
 // Routes
@@ -13,7 +15,20 @@ function formatUptime(seconds: number): string {
 
 export const app: Express = express();
 
-app.use(express.json());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI!,
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 dias
+      httpOnly: true,
+    },
+  }),
+);
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -21,7 +36,6 @@ app.get("/health", (_req, res) => {
     uptime: formatUptime(process.uptime()),
     database:
       mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-    discordBot: "unknown",
   });
 });
 
