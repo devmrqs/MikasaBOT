@@ -5,6 +5,14 @@ import { loadCommands } from "./utils/loadCommands.js";
 import { connectDatabase } from "./config/database.js";
 import { startServer } from "./utils/startServer.js";
 
+process.on("unhandledRejection", (reason) => {
+  console.error("[process] promise rejeitada sem tratamento:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("[process] exceção não capturada:", error);
+});
+
 const { DISCORD_TOKEN } = process.env;
 
 if (!DISCORD_TOKEN) {

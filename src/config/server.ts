@@ -9,6 +9,9 @@ import { guildsRouter } from "../routes/guilds.routes.js";
 import { channelsRouter } from "../routes/channels.routes.js";
 import { messagesRouter } from "../routes/messages.routes.js";
 
+// Middleware
+import { errorHandler } from "../middlewares/errorHandler.js";
+
 function formatUptime(seconds: number): string {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -48,3 +51,5 @@ app.use("/auth", authRouter);
 app.use("/guilds", guildsRouter);
 app.use("/guilds", channelsRouter);
 app.use("/guilds", messagesRouter);
+
+app.use(errorHandler);
