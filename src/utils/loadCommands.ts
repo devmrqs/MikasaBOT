@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function loadCommands(client: Client) {
   const commandsPath = path.join(__dirname, "..", "commands");
-  const commandFiles = readdirSync(commandsPath).filter((file) =>
-    file.endsWith(".js"),
+  const commandFiles = readdirSync(commandsPath).filter(
+    (file) => file.endsWith(".js") || file.endsWith(".ts"),
   );
 
   for (const file of commandFiles) {

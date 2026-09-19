@@ -40,8 +40,10 @@ const event: BotEvent<"interactionCreate"> = {
     }
 
     if (interaction.isButton()) {
-      // Ainda não temos handlers de botão reais — vão entrar aqui
-      // conforme criarmos as ações do builder
+      await interaction.reply({
+        content: `Ação "${interaction.customId}" recebida! (em breve isso vai fazer algo de verdade)`,
+        flags: MessageFlags.Ephemeral,
+      });
       return;
     }
   },
