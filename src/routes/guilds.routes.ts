@@ -1,10 +1,9 @@
 import { Router } from "express";
 import { client } from "../config/client.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { isGuildAdmin } from "../utils/discordPermissions.js";
 
 export const guildsRouter = Router();
-
-const ADMINISTRATOR = 0x8;
 
 guildsRouter.get("/", requireAuth, async (req, res) => {
   const accessToken = req.session.discordAccessToken!;
@@ -28,8 +27,8 @@ guildsRouter.get("/", requireAuth, async (req, res) => {
     permissions: string;
   }>;
 
-  const adminGuilds = userGuilds.filter(
-    (guild) => (Number(guild.permissions) & ADMINISTRATOR) === ADMINISTRATOR,
+  const adminGuilds = userGuilds.filter((guild) =>
+    isGuildAdmin(guild.permissions),
   );
 
   const guildsWithBot = adminGuilds

@@ -1,13 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
-
-const ADMINISTRATOR = 0x8;
+import { isGuildAdmin } from "../utils/discordPermissions.js";
 
 export async function requireGuildAdmin(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  const { guildId } = req.params;
+  const guildId = req.params.guildId as string;
   const accessToken = req.session.discordAccessToken;
 
   if (!accessToken) {
@@ -35,15 +34,11 @@ export async function requireGuildAdmin(
   }>;
 
   const guild = userGuilds.find((g) => g.id === guildId);
-  const isAdmin =
-    guild && (Number(guild.permissions) & ADMINISTRATOR) === ADMINISTRATOR;
 
-  if (!isAdmin) {
-    res
-      .status(403)
-      .json({
-        error: "Você não tem permissão de administrador nesse servidor.",
-      });
+  if (!guild || !isGuildAdmin(guild.permissions)) {
+    res.status(403).json({
+      error: "Você não tem permissão de administrador nesse servidor.",
+    });
     return;
   }
 
