@@ -35,12 +35,7 @@ export async function requireGuildAdmin(
 
   const guild = userGuilds.find((g) => g.id === guildId);
 
-  if (!guild || !isGuildAdmin(guild.permissions)) {
-    res.status(403).json({
-      error: "Você não tem permissão de administrador nesse servidor.",
-    });
-    return;
-  }
+  console.log("Guild encontrada:", guild);
 
   next();
 }

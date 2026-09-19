@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { authRouter } from "../routes/auth.routes.js";
 import { guildsRouter } from "../routes/guilds.routes.js";
 import { channelsRouter } from "../routes/channels.routes.js";
+import { messagesRouter } from "../routes/messages.routes.js";
 
 function formatUptime(seconds: number): string {
   const hrs = Math.floor(seconds / 3600);
@@ -16,6 +17,8 @@ function formatUptime(seconds: number): string {
 }
 
 export const app: Express = express();
+
+app.use(express.json());
 
 app.use(
   session({
@@ -44,3 +47,4 @@ app.get("/health", (_req, res) => {
 app.use("/auth", authRouter);
 app.use("/guilds", guildsRouter);
 app.use("/guilds", channelsRouter);
+app.use("/guilds", messagesRouter);
